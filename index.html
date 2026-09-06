@@ -31,6 +31,10 @@
       border-radius: 8px;
       cursor: pointer;
       margin-bottom: 12px;
+      transition: background 0.2s;
+    }
+    .btn-main:active {
+      background-color: #0056b3;
     }
     .bank-grid {
       display: grid;
@@ -46,6 +50,10 @@
       border-radius: 6px;
       background: #fff;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-bank:active {
+      background: #e9ecef;
     }
   </style>
 </head>
@@ -53,39 +61,101 @@
 
   <div class="card">
     <h2>Pagamento Pix</h2>
-    <h1 style="color: #2b8a3e;">R$ 117,59</h1>
+    <h1 style="color: #2b8a3e; margin: 10px 0 20px 0;">R$ 117,59</h1>
     
     <button id="copyBtn" class="btn-main">Copiar Código Pix</button>
-    <p id="status" style="color: #2b8a3e; font-weight: bold; min-height: 20px;"></p>
+    <p id="status" style="color: #2b8a3e; font-weight: bold; min-height: 20px; margin: 10px 0; font-size: 14px;"></p>
 
     <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
     <h3>Abrir o App do Banco:</h3>
-    <p style="font-size: 13px; color: #666;">Copie o código acima e selecione seu banco abaixo:</p>
+    <p style="font-size: 13px; color: #666;">Clique no seu banco (o código Pix será copiado automaticamente):</p>
     
     <div class="bank-grid">
-      <button class="btn-bank" onclick="openBank('nubank://')">Nubank</button>
-      <button class="btn-bank" onclick="openBank('itau://')">Itaú</button>
-      <button class="btn-bank" onclick="openBank('bradesco://')">Bradesco</button>
-      <button class="btn-bank" onclick="openBank('santander://')">Santander</button>
-      <button class="btn-bank" onclick="openBank('bancodobrasil://')">Banco do Brasil</button>
-      <button class="btn-bank" onclick="openBank('bancointer://')">Inter</button>
-      <button class="btn-bank" onclick="openBank('caixa://')">Caixa</button>
-      <button class="btn-bank" onclick="openBank('mercadopago://')">Mercado Pago</button>
+      <button class="btn-bank" onclick="openBank('nubank://', 'com.nu.production')">Nubank</button>
+      <button class="btn-bank" onclick="openBank('itau://', 'com.itau')">Itaú</button>
+      <button class="btn-bank" onclick="openBank('bradesco://', 'com.bradesco')">Bradesco</button>
+      <button class="btn-bank" onclick="openBank('santanderbr://', 'com.santander.app')">Santander</button>
+      <button class="btn-bank" onclick="openBank('bancodobrasil://', 'br.com.bb.altair')">Banco do Brasil</button>
+      <button class="btn-bank" onclick="openBank('bancointer://', 'br.com.intermedium')">Inter</button>
+      <button class="btn-bank" onclick="openBank('caixatem://', 'br.gov.caixa.tem')">Caixa</button>
+      <button class="btn-bank" onclick="openBank('mercadopago://', 'com.mercadopago.wallet')">Mercado Pago</button>
     </div>
   </div>
 
   <script>
     const pixCode = "00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/3a9f269c-c112-4284-8cc2-e6639e761c115204000053039865802BR5925FACIO 4 FUNDO DE INVESTIM6009SAO PAULO62070503***6304CDFE";
-    
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(pixCode).then(() => {
-        document.getElementById('status').innerText = "Código Pix copiado!";
+
+    // Função de cópia garantida (Clipboard API com fallback tradicional)
+    function copyToClipboard(text) {
+      return new Promise((resolve) => {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text)
+            .then(() => resolve(true))
+            .catch(() => fallbackCopy(text, resolve));
+        } else {
+          fallbackCopy(text, resolve);
+        }
       });
+    }
+
+    function fallbackCopy(text, resolve) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        resolve(successful);
+      } catch (err) {
+        resolve(false);
+      }
+    }
+
+    // Ação do Botão Principal "Copiar Código Pix"
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('copyBtn');
+      const statusEl = document.getElementById('status');
+      
+      const success = await copyToClipboard(pixCode);
+      if (success) {
+        btn.innerText = "✓ Copiado!";
+        btn.style.backgroundColor = "#28a745";
+        statusEl.innerText = "Código Pix copiado para a área de transferência!";
+        setTimeout(() => {
+          btn.innerText = "Copiar Código Pix";
+          btn.style.backgroundColor = "#007bff";
+        }, 3000);
+      } else {
+        statusEl.innerText = "Erro ao copiar automaticamente. Selecione e copie o código.";
+      }
     });
 
-    function openBank(scheme) {
-      window.location.href = scheme;
+    // Ação dos Botões dos Bancos
+    async function openBank(scheme, androidPackage) {
+      const statusEl = document.getElementById('status');
+      
+      // 1. Copia o Pix primeiro
+      await copyToClipboard(pixCode);
+      statusEl.innerText = "✓ Código copiado! Redirecionando para o app...";
+
+      // 2. Tenta abrir o app do banco
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      
+      setTimeout(() => {
+        if (isAndroid && androidPackage) {
+          // No Android, usa Intent oficial para garantir abertura
+          const cleanScheme = scheme.replace('://', '');
+          window.location.href = `intent://#Intent;scheme=${cleanScheme};package=${androidPackage};end`;
+        } else {
+          // No iOS / Genérico
+          window.location.href = scheme;
+        }
+      }, 300);
     }
   </script>
 
