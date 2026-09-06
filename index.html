@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento Pix</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 40px;">
+  <h2>Pagamento Pix - R$ 117,59</h2>
+  <button id="copyBtn" style="padding: 15px 25px; font-size: 16px; cursor: pointer;">
+    Copiar Código Pix
+  </button>
+  <p id="status" style="color: green; font-weight: bold; margin-top: 15px;"></p>
+
+  <script>
+    const pixCode = "00020126580014br.gov.bcb.pix2536pix.pagseguro.com.br/qr/v2/cobv/7A3E9F81B2C44D5E9A1F2E3D4C5B6A7B5204000053039865406117.595802BR5915PAGSEGURO PAY6009SAO PAULO62070503***6304E1D2";
+    
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(pixCode).then(() => {
+        document.getElementById('status').innerText = "Código Pix copiado com sucesso!";
+      });
+    });
+  </script>
+</body>
+</html>
