@@ -4,22 +4,90 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pagamento Pix</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f4f6f8;
+      color: #333;
+    }
+    .card {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .btn-main {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      background-color: #007bff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .bank-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .btn-bank {
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding: 40px;">
-  <h2>Pagamento Pix - R$ 117,59</h2>
-  <button id="copyBtn" style="padding: 15px 25px; font-size: 16px; cursor: pointer;">
-    Copiar Código Pix
-  </button>
-  <p id="status" style="color: green; font-weight: bold; margin-top: 15px;"></p>
+<body>
+
+  <div class="card">
+    <h2>Pagamento Pix</h2>
+    <h1 style="color: #2b8a3e;">R$ 117,59</h1>
+    
+    <button id="copyBtn" class="btn-main">Copiar Código Pix</button>
+    <p id="status" style="color: #2b8a3e; font-weight: bold; min-height: 20px;"></p>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <h3>Abrir o App do Banco:</h3>
+    <p style="font-size: 13px; color: #666;">Copie o código acima e selecione seu banco abaixo:</p>
+    
+    <div class="bank-grid">
+      <button class="btn-bank" onclick="openBank('nubank://')">Nubank</button>
+      <button class="btn-bank" onclick="openBank('itau://')">Itaú</button>
+      <button class="btn-bank" onclick="openBank('bradesco://')">Bradesco</button>
+      <button class="btn-bank" onclick="openBank('santander://')">Santander</button>
+      <button class="btn-bank" onclick="openBank('bancodobrasil://')">Banco do Brasil</button>
+      <button class="btn-bank" onclick="openBank('bancointer://')">Inter</button>
+      <button class="btn-bank" onclick="openBank('caixa://')">Caixa</button>
+      <button class="btn-bank" onclick="openBank('mercadopago://')">Mercado Pago</button>
+    </div>
+  </div>
 
   <script>
     const pixCode = "00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/3a9f269c-c112-4284-8cc2-e6639e761c115204000053039865802BR5925FACIO 4 FUNDO DE INVESTIM6009SAO PAULO62070503***6304CDFE";
     
     document.getElementById('copyBtn').addEventListener('click', () => {
       navigator.clipboard.writeText(pixCode).then(() => {
-        document.getElementById('status').innerText = "Código Pix copiado com sucesso!";
+        document.getElementById('status').innerText = "Código Pix copiado!";
       });
     });
+
+    function openBank(scheme) {
+      window.location.href = scheme;
+    }
   </script>
+
 </body>
 </html>
