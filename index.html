@@ -31,10 +31,6 @@
       border-radius: 8px;
       cursor: pointer;
       margin-bottom: 12px;
-      transition: background 0.2s;
-    }
-    .btn-main:active {
-      background-color: #0056b3;
     }
     .bank-grid {
       display: grid;
@@ -50,10 +46,6 @@
       border-radius: 6px;
       background: #fff;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-bank:active {
-      background: #e9ecef;
     }
   </style>
 </head>
@@ -69,30 +61,27 @@
     <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
     <h3>Abrir o App do Banco:</h3>
-    <p style="font-size: 13px; color: #666;">Clique no seu banco (o código Pix será copiado automaticamente):</p>
+    <p style="font-size: 13px; color: #666;">Selecione seu banco (o código será copiado automaticamente):</p>
     
     <div class="bank-grid">
-      <button class="btn-bank" onclick="openBank('nubank://', 'com.nu.production')">Nubank</button>
-      <button class="btn-bank" onclick="openBank('itau://', 'com.itau')">Itaú</button>
-      <button class="btn-bank" onclick="openBank('bradesco://', 'com.bradesco')">Bradesco</button>
-      <button class="btn-bank" onclick="openBank('santanderbr://', 'com.santander.app')">Santander</button>
-      <button class="btn-bank" onclick="openBank('bancodobrasil://', 'br.com.bb.altair')">Banco do Brasil</button>
-      <button class="btn-bank" onclick="openBank('bancointer://', 'br.com.intermedium')">Inter</button>
-      <button class="btn-bank" onclick="openBank('caixatem://', 'br.gov.caixa.tem')">Caixa</button>
-      <button class="btn-bank" onclick="openBank('mercadopago://', 'com.mercadopago.wallet')">Mercado Pago</button>
+      <button class="btn-bank" onclick="openBank('nubank://')">Nubank</button>
+      <button class="btn-bank" onclick="openBank('itau://')">Itaú</button>
+      <button class="btn-bank" onclick="openBank('bradesco://')">Bradesco</button>
+      <button class="btn-bank" onclick="openBank('santander://')">Santander</button>
+      <button class="btn-bank" onclick="openBank('bancodobrasil://')">Banco do Brasil</button>
+      <button class="btn-bank" onclick="openBank('bancointer://')">Inter</button>
+      <button class="btn-bank" onclick="openBank('caixa://')">Caixa</button>
+      <button class="btn-bank" onclick="openBank('mercadopago://')">Mercado Pago</button>
     </div>
   </div>
 
   <script>
     const pixCode = "00020126360014br.gov.bcb.pix0114+5519982381491520400005303986540550.005802BR5924Vinicius De Souza Zaneti6009Sao Paulo62290525REC6A9DFE57639C944972474063049A51";
 
-    // Função de cópia garantida (Clipboard API com fallback tradicional)
     function copyToClipboard(text) {
       return new Promise((resolve) => {
         if (navigator.clipboard && window.isSecureContext) {
-          navigator.clipboard.writeText(text)
-            .then(() => resolve(true))
-            .catch(() => fallbackCopy(text, resolve));
+          navigator.clipboard.writeText(text).then(() => resolve(true)).catch(() => fallbackCopy(text, resolve));
         } else {
           fallbackCopy(text, resolve);
         }
@@ -116,7 +105,6 @@
       }
     }
 
-    // Ação do Botão Principal "Copiar Código Pix"
     document.getElementById('copyBtn').addEventListener('click', async () => {
       const btn = document.getElementById('copyBtn');
       const statusEl = document.getElementById('status');
@@ -125,37 +113,25 @@
       if (success) {
         btn.innerText = "✓ Copiado!";
         btn.style.backgroundColor = "#28a745";
-        statusEl.innerText = "Código Pix copiado para a área de transferência!";
+        statusEl.innerText = "Código Pix copiado com sucesso!";
         setTimeout(() => {
           btn.innerText = "Copiar Código Pix";
           btn.style.backgroundColor = "#007bff";
         }, 3000);
-      } else {
-        statusEl.innerText = "Erro ao copiar automaticamente. Selecione e copie o código.";
       }
     });
 
-    // Ação dos Botões dos Bancos
-    async function openBank(scheme, androidPackage) {
+    async function openBank(scheme) {
       const statusEl = document.getElementById('status');
       
-      // 1. Copia o Pix primeiro
+      // 1. Copia o código para a área de transferência
       await copyToClipboard(pixCode);
-      statusEl.innerText = "✓ Código copiado! Redirecionando para o app...";
+      statusEl.innerText = "✓ Código copiado! Abrindo aplicativo...";
 
-      // 2. Tenta abrir o app do banco
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      
+      // 2. Abre o aplicativo diretamente no celular sem redirecionar para a Play Store
       setTimeout(() => {
-        if (isAndroid && androidPackage) {
-          // No Android, usa Intent oficial para garantir abertura
-          const cleanScheme = scheme.replace('://', '');
-          window.location.href = `intent://#Intent;scheme=${cleanScheme};package=${androidPackage};end`;
-        } else {
-          // No iOS / Genérico
-          window.location.href = scheme;
-        }
-      }, 300);
+        window.location.href = scheme;
+      }, 200);
     }
   </script>
 
